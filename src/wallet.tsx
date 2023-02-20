@@ -1,11 +1,11 @@
 import Web3Modal from 'web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Button, Col, notification} from "antd";
-import {ethers} from "ethers";
 import {CopyOutlined} from "@ant-design/icons";
 import {SiEthereum} from "react-icons/si";
 import "./global.d.ts";
+import {providers} from "ethers";
 
 let providerOptions: any = {
     walletconnect: {
@@ -19,7 +19,8 @@ let providerOptions: any = {
 const web3Modal = new Web3Modal({
     providerOptions,
     cacheProvider: true,
-    disableInjectedProvider: false
+    disableInjectedProvider: false,
+    network: "goerli"
 })
 
 const Wallet: React.FC = () => {
@@ -29,19 +30,42 @@ const Wallet: React.FC = () => {
     const [api, contextHolder] = notification.useNotification();
 
     const addressRef = useRef<HTMLDivElement | null>(null);
-    const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
     const [address, setAddress] = useState("")
     const [showAddress, setShowAddress] = useState("")
 
+    useEffect(() => {
+        if (web3Modal.cachedProvider) {
+            web3Modal.connect().then(function (wallet) {
+                addListeners(wallet)
+                window.wallet = wallet
+
+                const provider = new providers.Web3Provider(wallet)
+                window.provider = provider
+                showAddressEle()
+            }).catch(function (err) {
+                console.log(err)
+            })
+        }
+    })
+
     const connectWallet = async () => {
+        if (web3Modal.cachedProvider) {
+            web3Modal.clearCachedProvider()
+        }
+
         web3Modal.connect().then(function (wallet) {
-            const provider = new ethers.providers.Web3Provider(wallet)
+            addListeners(wallet)
+            window.wallet = wallet
+
+            const provider = new providers.Web3Provider(wallet)
             window.provider = provider
+            showAddressEle()
+        })
+    }
 
-            setProvider(provider)
-            addListeners(provider)
-
-            provider.getSigner().getAddress().then(function (address) {
+    const showAddressEle = async () => {
+        if (window.provider) {
+            window.provider.getSigner().getAddress().then(function (address) {
                 setAddress(address)
                 window.address = address
 
@@ -52,34 +76,28 @@ const Wallet: React.FC = () => {
                 if (addressRef.current) {
                     addressRef.current.style.visibility = "visible"
                 }
-            })
-        })
-    }
-
-    const connectWeb3Modal = async () => {
-        if (web3Modal.cachedProvider) {
-            web3Modal.clearCachedProvider()
+            });
         }
-        await connectWallet()
     }
 
     const disconnectWeb3Modal = async () => {
         web3Modal.clearCachedProvider()
-        setProvider(null)
+        setAddress("");
+        window.address = ""
     }
 
-    async function addListeners(provider: ethers.providers.Web3Provider) {
-        provider.addListener("accountsChanged", (accounts: string[]) => {
-            console.log(accounts)
-            setAddress(accounts[0] ? accounts[0] : "");
+    async function addListeners(wallet: any) {
+        wallet.on("accountsChanged", (accounts: string[]) => {
+            const address = accounts[0] ? accounts[0] : ""
+            setAddress(address);
+            window.address = address
         });
-        //
-        // provider.addListener("chainChanged", (chainId: any) => {
-        //     console.log(chainId)
-        //     // window.location.reload()
-        // });
-        //
-        provider.addListener("disconnect", function () {
+
+        wallet.on("chainChanged", (chainId: any) => {
+            window.provider.network.chainId = chainId
+        });
+
+        wallet.on("disconnect", function () {
             disconnectWeb3Modal()
         })
     }
@@ -102,7 +120,7 @@ const Wallet: React.FC = () => {
                 </Context.Provider>
             </Col>
             <Col span={4}>
-                <Button type="primary" onClick={connectWeb3Modal}>
+                <Button type="primary" onClick={connectWallet}>
                     Connect Wallet
                 </Button>
             </Col>

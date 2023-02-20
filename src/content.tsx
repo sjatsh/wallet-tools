@@ -13,7 +13,7 @@ const SignContent: React.FC = () => {
     async function signMsgChange(e: any) {
         const signMsg = e.target.value
         setSignMsg(signMsg)
-        if (signRes != "") {
+        if (signRes !== "") {
             setSignRes("")
         }
 
@@ -27,12 +27,12 @@ const SignContent: React.FC = () => {
             if (signMsgObj.mm_json) {
                 mmJson = signMsgObj.mm_json
             }
-            if (signMsgObj.sign_list.length>0){
+            if (signMsgObj.sign_list.length > 0) {
                 mmJson.message.digest = signMsgObj.sign_list[0].sign_msg
             }
 
             if (mmJson.types.EIP712Domain.length > 0 &&
-                mmJson.primaryType != "" &&
+                mmJson.primaryType !== "" &&
                 mmJson.domain && mmJson.message) {
                 setEip712(true)
                 setSignMsg(JSON.stringify(mmJson))
@@ -46,7 +46,7 @@ const SignContent: React.FC = () => {
     }
 
     async function copySignRes() {
-        if (signRes != "") {
+        if (signRes !== "") {
             await navigator.clipboard.writeText(signRes);
             api.info({
                 message: `sign result copied`,
@@ -55,46 +55,31 @@ const SignContent: React.FC = () => {
     }
 
     async function personalSign() {
-        try {
-            const {ethereum, address} = window
-            const res = await ethereum.request({
-                method: 'personal_sign',
-                params: [signMsg, address]
-            })
-            if (res) {
-                setSignRes(res)
-            }
-        } catch (err: any) {
-            console.error(err)
-            if (err.code == 4001) {
+        const {provider} = window
+        provider.getSigner().signMessage(signMsg).then(function (res) {
+            setSignRes(res)
+        }).catch(function (err) {
+            if (err.code === 4001 || err.code === "ACTION_REJECTED") {
                 return
             }
             api.error({
                 "message": JSON.stringify({"code": err.code, "message": err.message}),
             })
-        }
+        })
     }
 
     async function eip712Sign() {
-        try {
-            const {ethereum, address} = window
-            const res = await ethereum.request({
-                method: 'eth_signTypedData_v4',
-                params: [address, signMsg],
-                from: address
-            })
-            if (res) {
-                setSignRes(res)
-            }
-        } catch (err: any) {
-            console.error(err)
-            if (err.code == 4001) {
+        const {provider, address} = window
+        provider.send("eth_signTypedData_v4", [address.toLowerCase(), signMsg]).then(function (res) {
+            setSignRes(res)
+        }).catch(function (err) {
+            if (err.code === 4001 || err.code === "ACTION_REJECTED") {
                 return
             }
             api.error({
                 "message": JSON.stringify({"code": err.code, "message": err.message}),
             })
-        }
+        })
     }
 
     function SignButton() {

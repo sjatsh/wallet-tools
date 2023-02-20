@@ -1,9 +1,10 @@
-import {ethers} from "ethers";
+import {providers} from "ethers";
 
 declare global {
     interface Window {
         address: string;
-        provider: ethers.providers.Web3Provider;
+        wallet: any;
+        provider: providers.Web3Provider;
     }
 }
 
