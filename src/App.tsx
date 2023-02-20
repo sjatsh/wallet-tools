@@ -23,7 +23,6 @@ const App: React.FC = () => {
                 }}
             >
                 <Row gutter={[16, 16]}>
-                    <Col span={18}/>
                     <Wallet/>
                 </Row>
             </Header>

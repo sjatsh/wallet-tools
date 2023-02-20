@@ -93,12 +93,12 @@ const Wallet: React.FC = () => {
 
     return (
         <>
-            <Col ref={addressRef} span={2} flex={"auto"} style={{visibility: "hidden"}}>
-                <SiEthereum/>
+            <Col ref={addressRef} span={20} style={{visibility: "hidden", display: 'flex', justifyContent: 'flex-end'}}>
+                <span><SiEthereum/></span>
                 <span style={{paddingLeft: "8px"}}>{showAddress}</span>
                 <Context.Provider value={contextValue}>
                     {contextHolder}
-                    <CopyOutlined style={{paddingLeft: '8px'}} onClick={copyAddress}/>
+                    <span><CopyOutlined style={{paddingLeft: '8px'}} onClick={copyAddress}/></span>
                 </Context.Provider>
             </Col>
             <Col span={4}>
