@@ -5,6 +5,7 @@ import {Button, Col, notification} from "antd";
 import {ethers} from "ethers";
 import {CopyOutlined} from "@ant-design/icons";
 import {SiEthereum} from "react-icons/si";
+import "./global.d.ts";
 
 let providerOptions: any = {
     walletconnect: {
@@ -35,7 +36,6 @@ const Wallet: React.FC = () => {
     const connectWallet = async () => {
         web3Modal.connect().then(function (wallet) {
             const provider = new ethers.providers.Web3Provider(wallet)
-            // @ts-ignore
             window.provider = provider
 
             setProvider(provider)
@@ -43,6 +43,7 @@ const Wallet: React.FC = () => {
 
             provider.getSigner().getAddress().then(function (address) {
                 setAddress(address)
+                window.address = address
 
                 let showAddr = address.substring(0, 6) + "..."
                 showAddr += address.substring(address.length - 4, address.length)
@@ -51,12 +52,6 @@ const Wallet: React.FC = () => {
                 if (addressRef.current) {
                     addressRef.current.style.visibility = "visible"
                 }
-                // const addressClasses = document.getElementsByClassName("addressClass")
-                // for (let i = 0; i < addressClasses.length; i++) {
-                //     let addressClass = addressClasses[i]
-                //     @ts-ignore
-                // addressClass.style.visibility = "visible"
-                // }
             })
         })
     }
