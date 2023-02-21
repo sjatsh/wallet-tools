@@ -20,7 +20,6 @@ const web3Modal = new Web3Modal({
     providerOptions,
     cacheProvider: true,
     disableInjectedProvider: false,
-    network: "goerli"
 })
 
 const Wallet: React.FC = () => {
@@ -95,6 +94,7 @@ const Wallet: React.FC = () => {
 
         wallet.on("chainChanged", (chainId: any) => {
             window.provider.network.chainId = chainId
+            window.wallet.chainId = chainId
         });
 
         wallet.on("disconnect", function () {

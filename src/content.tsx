@@ -55,7 +55,12 @@ const SignContent: React.FC = () => {
     }
 
     async function personalSign() {
-        const {provider} = window
+        const {provider, address} = window
+        if (!address) {
+            api.error({message: "Please connect wallet before"})
+            return
+        }
+
         provider.getSigner().signMessage(signMsg).then(function (res) {
             setSignRes(res)
         }).catch(function (err) {
@@ -70,6 +75,22 @@ const SignContent: React.FC = () => {
 
     async function eip712Sign() {
         const {provider, address} = window
+        if (!address) {
+            api.error({message: "Please connect wallet before"})
+            return
+        }
+        const mmJson = JSON.parse(signMsg)
+
+        if (provider && mmJson.domain.chainId && mmJson.domain.chainId != provider.network.chainId) {
+            provider.send(
+                "wallet_switchEthereumChain",
+                [{"chainId": '0x' + mmJson.domain.chainId}]).then(function (res) {
+                console.log(res)
+            }).catch(function (err) {
+                console.log(err)
+            })
+        }
+
         provider.send("eth_signTypedData_v4", [address.toLowerCase(), signMsg]).then(function (res) {
             setSignRes(res)
         }).catch(function (err) {
