@@ -82,12 +82,12 @@ const SignContent: React.FC = () => {
         const mmJson = JSON.parse(signMsg)
 
         if (provider && mmJson.domain.chainId && mmJson.domain.chainId != provider.network.chainId) {
-            provider.send(
+            await provider.send(
                 "wallet_switchEthereumChain",
                 [{"chainId": '0x' + mmJson.domain.chainId}]).then(function (res) {
                 console.log(res)
             }).catch(function (err) {
-                console.log(err)
+                console.error(err)
             })
         }
 
