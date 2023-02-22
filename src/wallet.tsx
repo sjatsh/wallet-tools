@@ -18,7 +18,6 @@ let providerOptions: any = {
 
 const web3Modal = new Web3Modal({
     providerOptions,
-    cacheProvider: true,
     disableInjectedProvider: false,
 })
 
