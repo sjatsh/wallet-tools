@@ -18,6 +18,7 @@ let providerOptions: any = {
 
 const web3Modal = new Web3Modal({
     providerOptions,
+    cacheProvider: true,
     disableInjectedProvider: false,
 })
 
@@ -34,14 +35,15 @@ const Wallet: React.FC = () => {
     useEffect(() => {
         if (web3Modal.cachedProvider) {
             web3Modal.connect().then(function (wallet) {
-                addListeners(wallet)
                 window.wallet = wallet
+                addListeners(wallet)
 
                 const provider = new providers.Web3Provider(wallet)
+
                 window.provider = provider
                 showAddressEle()
             }).catch(function (err) {
-                console.log(err)
+                console.error(err)
             })
         }
     })
@@ -63,7 +65,7 @@ const Wallet: React.FC = () => {
 
     const showAddressEle = async () => {
         if (window.provider) {
-            window.provider.getSigner().getAddress().then(function (address) {
+            window.provider.getSigner().getAddress().then(function (address: any) {
                 setAddress(address)
                 window.address = address
 
@@ -79,9 +81,14 @@ const Wallet: React.FC = () => {
     }
 
     const disconnectWeb3Modal = async () => {
+        if (window.wallet) {
+            window.wallet.disconnect()
+        }
+        window.wallet = null
+        window.provider = null
+        window.address = ""
         web3Modal.clearCachedProvider()
         setAddress("");
-        window.address = ""
     }
 
     async function addListeners(wallet: any) {

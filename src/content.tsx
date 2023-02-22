@@ -61,9 +61,9 @@ const SignContent: React.FC = () => {
             return
         }
 
-        provider.getSigner().signMessage(signMsg).then(function (res) {
+        provider.getSigner().signMessage(signMsg).then(function (res: any) {
             setSignRes(res)
-        }).catch(function (err) {
+        }).catch(function (err: any) {
             if (err.code === 4001 || err.code === "ACTION_REJECTED") {
                 return
             }
@@ -84,16 +84,16 @@ const SignContent: React.FC = () => {
         if (provider && mmJson.domain.chainId && mmJson.domain.chainId != provider.network.chainId) {
             await provider.send(
                 "wallet_switchEthereumChain",
-                [{"chainId": '0x' + mmJson.domain.chainId}]).then(function (res) {
+                [{"chainId": '0x' + mmJson.domain.chainId}]).then(function (res: any) {
                 console.log(res)
-            }).catch(function (err) {
+            }).catch(function (err: any) {
                 console.error(err)
             })
         }
 
-        provider.send("eth_signTypedData_v4", [address.toLowerCase(), signMsg]).then(function (res) {
+        provider.send("eth_signTypedData_v4", [address.toLowerCase(), signMsg]).then(function (res: any) {
             setSignRes(res)
-        }).catch(function (err) {
+        }).catch(function (err: any) {
             if (err.code === 4001 || err.code === "ACTION_REJECTED") {
                 return
             }
