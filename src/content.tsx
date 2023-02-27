@@ -60,8 +60,7 @@ const SignContent: React.FC = () => {
             api.error({message: "Please connect wallet before"})
             return
         }
-
-        provider.getSigner().signMessage(signMsg).then(function (res: any) {
+        provider.send("personal_sign", [address.toLowerCase(), signMsg]).then(function (res: any) {
             setSignRes(res)
         }).catch(function (err: any) {
             if (err.code === 4001 || err.code === "ACTION_REJECTED") {
