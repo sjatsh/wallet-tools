@@ -23,46 +23,49 @@ const web3Modal = new Web3Modal({
 })
 
 const Wallet: React.FC = () => {
+    const [api, contextHolder] = notification.useNotification();
     const Context = React.createContext({name: 'Address'});
     const contextValue = useMemo(() => ({name: 'Copy Address'}), []);
-    const [api, contextHolder] = notification.useNotification();
-
-    const addressRef = useRef<HTMLDivElement | null>(null);
     const [address, setAddress] = useState("")
     const [showAddress, setShowAddress] = useState("")
+    const [inited, setInited] = useState(false)
+    const [chainIdIcon, setChainIdIcon] = useState<any>()
+    const addressRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        if (web3Modal.cachedProvider) {
-            web3Modal.connect().then(function (wallet) {
-                window.wallet = wallet
-                addListeners(wallet)
-
-                const provider = new providers.Web3Provider(wallet)
-
-                window.provider = provider
-                showAddressEle()
-            }).catch(function (err) {
-                console.error(err)
-            })
+        if (inited) {
+            return
         }
+        setInited(true)
+        if (!web3Modal.cachedProvider) {
+            return
+        }
+        web3Modal.connectTo(web3Modal.cachedProvider).then(function (wallet) {
+            connect(wallet)
+        }).catch(function (err) {
+            console.error(err)
+        })
     })
 
     const connectWallet = async () => {
         if (web3Modal.cachedProvider) {
             web3Modal.clearCachedProvider()
         }
-
         web3Modal.connect().then(function (wallet) {
-            addListeners(wallet)
-            window.wallet = wallet
-
-            const provider = new providers.Web3Provider(wallet)
-            window.provider = provider
-            showAddressEle()
+            connect(wallet)
         })
     }
 
-    const showAddressEle = async () => {
+    function connect(wallet: any) {
+        window.wallet = wallet
+        addListeners(wallet)
+        window.chainId = wallet.chainId
+        chainIcon()
+        window.provider = new providers.Web3Provider(wallet)
+        showAddressEle()
+    }
+
+    const showAddressEle = () => {
         if (window.provider) {
             window.provider.getSigner().getAddress().then(function (address: any) {
                 setAddress(address)
@@ -79,7 +82,7 @@ const Wallet: React.FC = () => {
         }
     }
 
-    const disconnectWeb3Modal = async () => {
+    const disconnectWeb3Modal = () => {
         if (window.wallet) {
             window.wallet.disconnect()
         }
@@ -90,7 +93,7 @@ const Wallet: React.FC = () => {
         setAddress("");
     }
 
-    async function addListeners(wallet: any) {
+    function addListeners(wallet: any) {
         wallet.on("accountsChanged", (accounts: string[]) => {
             const address = accounts[0] ? accounts[0] : ""
             setAddress(address);
@@ -98,8 +101,8 @@ const Wallet: React.FC = () => {
         });
 
         wallet.on("chainChanged", (chainId: any) => {
-            window.provider.network.chainId = chainId
-            window.wallet.chainId = chainId
+            window.chainId = chainId
+            chainIcon()
         });
 
         wallet.on("disconnect", function () {
@@ -114,11 +117,19 @@ const Wallet: React.FC = () => {
         });
     }
 
+    function chainIcon() {
+        switch (window.chainId) {
+            case "0x1":
+            case "0x5":
+                setChainIdIcon(<SiEthereum/>)
+        }
+    }
+
     return (
         <>
             <Col ref={addressRef} span={20} style={{visibility: "hidden", display: 'flex', justifyContent: 'flex-end'}}>
-                <span><SiEthereum/></span>
-                <span style={{paddingLeft: "8px"}}>{showAddress}</span>
+                <div>{chainIdIcon}</div>
+                <div style={{paddingLeft: "8px"}}>{showAddress}</div>
                 <Context.Provider value={contextValue}>
                     {contextHolder}
                     <span><CopyOutlined style={{paddingLeft: '8px'}} onClick={copyAddress}/></span>

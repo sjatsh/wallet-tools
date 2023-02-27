@@ -3,6 +3,7 @@ declare global {
         address: string;
         wallet: any;
         provider: any;
+        chainId: any;
     }
 }
 
