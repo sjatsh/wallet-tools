@@ -7,11 +7,11 @@ import {SiEthereum} from "react-icons/si";
 import "./global.d.ts";
 import {providers} from "ethers";
 
-let providerOptions: any = {
+const providerOptions: any = {
     walletconnect: {
         package: WalletConnectProvider,
         options: {
-            infuraId: 'f62b13efac034161adb35e1b7cdbafeb',
+            infuraId: process.env.REACT_APP_INFURA_ID,
         },
     }
 }
@@ -23,7 +23,6 @@ const web3Modal = new Web3Modal({
 })
 
 const Wallet: React.FC = () => {
-
     const Context = React.createContext({name: 'Address'});
     const contextValue = useMemo(() => ({name: 'Copy Address'}), []);
     const [api, contextHolder] = notification.useNotification();
