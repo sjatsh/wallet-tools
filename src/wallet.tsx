@@ -12,8 +12,9 @@ const providerOptions: any = {
         package: WalletConnectProvider,
         options: {
             infuraId: process.env.REACT_APP_INFURA_ID,
+            autoRefreshOnNetworkChange: false,
         },
-    }
+    },
 }
 
 const web3Modal = new Web3Modal({
@@ -40,7 +41,7 @@ const Wallet: React.FC = () => {
         if (!web3Modal.cachedProvider) {
             return
         }
-        web3Modal.connectTo(web3Modal.cachedProvider).then(function (wallet) {
+        web3Modal.connect().then(function (wallet) {
             connect(wallet)
         }).catch(function (err) {
             console.error(err)
@@ -66,20 +67,21 @@ const Wallet: React.FC = () => {
     }
 
     const showAddressEle = () => {
-        if (window.provider) {
-            window.provider.getSigner().getAddress().then(function (address: any) {
-                setAddress(address)
-                window.address = address
-
-                let showAddr = address.substring(0, 6) + "..."
-                showAddr += address.substring(address.length - 4, address.length)
-                setShowAddress(showAddr)
-
-                if (addressRef.current) {
-                    addressRef.current.style.visibility = "visible"
-                }
-            });
+        if (!window.provider) {
+            return
         }
+        window.provider.getSigner().getAddress().then(function (address: any) {
+            setAddress(address)
+            window.address = address
+
+            let showAddr = address.substring(0, 6) + "..."
+            showAddr += address.substring(address.length - 4, address.length)
+            setShowAddress(showAddr)
+
+            if (addressRef.current) {
+                addressRef.current.style.visibility = "visible"
+            }
+        });
     }
 
     const disconnectWeb3Modal = () => {
