@@ -30,7 +30,7 @@ const App: React.FC = () => {
                 <div style={{
                     padding: 24,
                     background: colorBgContainer,
-                    minHeight: '800px',
+                    minHeight: '700px',
                     width: '500px',
                     borderRadius: '16px',
                     boxShadow: '0 6px 8px 0 rgb(223 231 227 / 86%)',
