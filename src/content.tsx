@@ -16,33 +16,6 @@ const SignContent: React.FC = () => {
         if (signRes !== "") {
             setSignRes("")
         }
-
-        try {
-            let signMsgObj = JSON.parse(signMsg)
-            if (signMsgObj.data) {
-                signMsgObj = signMsgObj.data
-            }
-
-            let mmJson = signMsgObj
-            if (signMsgObj.mm_json) {
-                mmJson = signMsgObj.mm_json
-            }
-            if (signMsgObj.sign_list.length > 0) {
-                mmJson.message.digest = signMsgObj.sign_list[0].sign_msg
-            }
-
-            if (mmJson.types.EIP712Domain.length > 0 &&
-                mmJson.primaryType !== "" &&
-                mmJson.domain && mmJson.message) {
-                setEip712(true)
-                setSignMsg(JSON.stringify(mmJson))
-            } else {
-                setEip712(false)
-            }
-
-        } catch (e) {
-            setEip712(false)
-        }
     }
 
     async function copySignRes() {
@@ -70,6 +43,19 @@ const SignContent: React.FC = () => {
                 "message": JSON.stringify({"code": err.code, "message": err.message}),
             })
         })
+    }
+
+    async function webAuthnSign() {
+        const {connectDID} = window
+
+        const signData = await connectDID.requestSignData({
+            msg: signMsg,
+        });
+        if (signData.code !== 2000) {
+            api.error({message: signData.message})
+            return
+        }
+        setSignRes(signData.data)
     }
 
     async function eip712Sign() {
@@ -103,17 +89,17 @@ const SignContent: React.FC = () => {
     }
 
     function SignButton() {
-        if (eip712) {
-            return (
-                <Button type={"primary"} onClick={eip712Sign}>
+        return (<div>
+                <Button type={"primary"} onClick={personalSign} style={{margin: "5px"}}>
+                    Personal Sign
+                </Button>
+                <Button type={"primary"} onClick={eip712Sign} style={{margin: "5px"}}>
                     EIP712 Sign
                 </Button>
-            )
-        }
-        return (
-            <Button type={"primary"} onClick={personalSign}>
-                Personal Sign
-            </Button>
+                <Button type={"primary"} onClick={webAuthnSign} style={{margin: "5px"}}>
+                    WebAuthn Sign
+                </Button>
+            </div>
         )
     }
 

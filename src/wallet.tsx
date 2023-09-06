@@ -6,13 +6,14 @@ import {CopyOutlined} from "@ant-design/icons";
 import {SiEthereum} from "react-icons/si";
 import "./global.d.ts";
 import {providers} from "ethers";
+import {ConnectDID} from "connect-did-sdk";
 
 const providerOptions: any = {
     walletconnect: {
         package: WalletConnectProvider,
         options: {
             infuraId: process.env.REACT_APP_INFURA_ID,
-            autoRefreshOnNetworkChange: false,
+            autoRefreshOnNetworkChange: true,
         },
     },
 }
@@ -32,6 +33,7 @@ const Wallet: React.FC = () => {
     const [inited, setInited] = useState(false)
     const [chainIdIcon, setChainIdIcon] = useState<any>()
     const addressRef = useRef<HTMLDivElement | null>(null);
+    window.connectDID = new ConnectDID();
 
     useEffect(() => {
         if (inited) {

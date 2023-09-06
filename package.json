@@ -16,6 +16,7 @@
     "antd": "^5.2.2",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
+    "connect-did-sdk": "^0.1.12",
     "craco": "^0.0.3",
     "crypto-browserify": "^3.12.0",
     "eslint-config-react-app": "^7.0.1",
@@ -39,10 +40,10 @@
     "util": "^0.12.5",
     "wallet-sdk-js": "^0.0.14",
     "web-vitals": "^2.1.0",
-    "web3": "^1.8.2",
+    "web3": "4.0.1",
     "web3-react": "^5.0.5",
     "web3modal": "^1.9.12",
-    "webpack": "^5.75.0",
+    "webpack": "5.76.0",
     "xhr2-cookies": "^1.1.0"
   },
   "browser": {
