@@ -14,7 +14,8 @@ module.exports = function override(config) {
     };
 
     config.plugins = [...config.plugins, new webpack.ProvidePlugin({
-        process: "process/browser", Buffer: ["buffer", "Buffer"],
+        process: "process/browser",
+        Buffer: ["buffer", "Buffer"],
     }),];
     return config;
 };
