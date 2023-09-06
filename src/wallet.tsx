@@ -33,7 +33,12 @@ const Wallet: React.FC = () => {
     const [inited, setInited] = useState(false)
     const [chainIdIcon, setChainIdIcon] = useState<any>()
     const addressRef = useRef<HTMLDivElement | null>(null);
-    window.connectDID = new ConnectDID();
+
+    try {
+        window.connectDID = new ConnectDID();
+    } catch (e) {
+        console.error(e);
+    }
 
     useEffect(() => {
         if (inited) {
