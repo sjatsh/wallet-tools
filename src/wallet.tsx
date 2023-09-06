@@ -34,6 +34,8 @@ const Wallet: React.FC = () => {
     const [chainIdIcon, setChainIdIcon] = useState<any>()
     const addressRef = useRef<HTMLDivElement | null>(null);
 
+    window.connectDID = new ConnectDID();
+
     useEffect(() => {
         if (inited) {
             return
@@ -42,7 +44,6 @@ const Wallet: React.FC = () => {
         if (!web3Modal.cachedProvider) {
             return
         }
-        window.connectDID = new ConnectDID();
         web3Modal.connect().then(function (wallet) {
             connect(wallet)
         }).catch(function (err) {

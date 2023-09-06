@@ -1,6 +1,8 @@
 import TextArea from "antd/es/input/TextArea";
-import {Button, notification, Row} from "antd";
+import {Button, notification, Row, Switch} from "antd";
 import React, {useMemo, useState} from "react";
+import {ConnectDID} from "connect-did-sdk";
+import {SwitchChangeEventHandler} from "antd/es/switch";
 
 const SignContent: React.FC = () => {
     const [signMsg, setSignMsg] = useState("")
@@ -46,16 +48,19 @@ const SignContent: React.FC = () => {
     }
 
     async function webAuthnSign() {
-        const {connectDID} = window
-
-        const signData = await connectDID.requestSignData({
-            msg: signMsg,
-        });
-        if (signData.code !== 2000) {
-            api.error({message: signData.message})
+        try {
+            const signData = await window.connectDID.requestSignData({
+                msg: signMsg,
+            });
+            if (signData.code !== 2000) {
+                api.error({message: signData.message})
+                return
+            }
+            setSignRes(signData.data)
+        } catch (e: any) {
+            console.warn(e)
             return
         }
-        setSignRes(signData.data)
     }
 
     async function eip712Sign() {
@@ -88,17 +93,23 @@ const SignContent: React.FC = () => {
         })
     }
 
+    const netSwitch = (checked: boolean, event: React.MouseEvent<HTMLButtonElement>) => {
+        console.log(checked)
+        window.connectDID = new ConnectDID(checked);
+    }
+
     function SignButton() {
         return (<div>
                 <Button type={"primary"} onClick={personalSign} style={{margin: "5px"}}>
-                    Personal Sign
+                    Personal
                 </Button>
                 <Button type={"primary"} onClick={eip712Sign} style={{margin: "5px"}}>
-                    EIP712 Sign
+                    EIP712
                 </Button>
                 <Button type={"primary"} onClick={webAuthnSign} style={{margin: "5px"}}>
-                    WebAuthn Sign
+                    WebAuthn
                 </Button>
+                <Switch checkedChildren="TestNet" unCheckedChildren="MainNet" defaultChecked onChange={netSwitch}/>
             </div>
         )
     }

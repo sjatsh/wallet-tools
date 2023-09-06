@@ -1,5 +1,3 @@
-import {ConnectDID} from "connect-did-sdk";
-
 declare global {
     interface Window {
         address: string;
